@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foro de Discusión</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Estilos básicos que pueden complementarse con styles.css */
+        body {
+            background-color: #faf482;
+        }
+
+        .forum-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comment-box {
+            margin-top: 20px;
+        }
+
+        .comment {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+        }
+
+        .comment h4 {
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        .comment p {
+            margin: 5px 0;
+        }
+        
+        .user-box {
+            margin-bottom: 20px;
+        }
+
+        .user-box input {
+            padding: 5px;
+            width: calc(100% - 120px);
+            margin-right: 10px;
+        }
+
+        .user-box button {
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Foro de Discusión</h1>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="estrategias.html">Estrategias de Enseñanza</a>
+            <a href="recursos.html">Recursos</a>
+            <a href="foro.html">Foro de Discusión</a>
+            <a href="historias.html">Historias de Éxito</a>
+            <a href="contacto.html">Contacto</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="forum-container">
+            <section>
+                <h2>Participa en Nuestro Foro</h2>
+                <p>Comparte experiencias, haz preguntas y recibe consejos de otros educadores y expertos.</p>
+
+                <!-- Sección para ingresar el nombre de usuario -->
+                <div class="user-box">
+                    <input type="text" id="username" placeholder="Ingresa tu nombre" />
+                    <button onclick="setUsername()">Iniciar</button>
+                    <button onclick="clearUsername()" style="display:none;" id="logoutButton">Salir</button>
+                </div>
+
+                <div class="comment-box">
+                    <h3>Escribe tu comentario</h3>
+                    <textarea id="comentario" placeholder="Escribe aquí tu comentario..." class="textarea"></textarea>
+                    <button onclick="enviarComentario()">Enviar</button>
+                </div>
+
+                <div class="comment-section">
+                    <h3>Comentarios Recientes</h3>
+                    <div id="listaComentarios">
+                        <!-- Aquí se mostrarán los comentarios -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Apoyo a Profesores. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        // Cargar comentarios al inicio
+        document.addEventListener("DOMContentLoaded", function() {
+            cargarComentarios();
+            mostrarNombreUsuario();
+        });
+
+        // Función para mostrar el nombre de usuario
+        function mostrarNombreUsuario() {
+            const username = localStorage.getItem("username");
+            if (username) {
+                document.getElementById("username").value = username;
+                document.getElementById("logoutButton").style.display = 'inline';
+            }
+        }
+
+        // Función para establecer el nombre de usuario
+        function setUsername() {
+            const username = document.getElementById("username").value.trim();
+            if (username) {
+                localStorage.setItem("username", username);
+                mostrarNombreUsuario();
+            } else {
+                alert("Por favor, ingresa un nombre válido.");
+            }
+        }
+
+        // Función para limpiar el nombre de usuario
+        function clearUsername() {
+            localStorage.removeItem("username");
+            document.getElementById("username").value = '';
+            document.getElementById("logoutButton").style.display = 'none';
+        }
+
+        // Función para cargar comentarios desde el almacenamiento local
+        function cargarComentarios() {
+            const comentarios = JSON.parse(localStorage.getItem("comentarios")) || [];
+            const listaComentarios = document.getElementById("listaComentarios");
+            listaComentarios.innerHTML = ""; // Limpiar los comentarios previos
+            comentarios.forEach(function(comentario) {
+                agregarComentarioAlDOM(comentario.texto, comentario.username);
+            });
+        }
+
+        // Función para agregar un comentario al DOM
+        function agregarComentarioAlDOM(comentario, username) {
+            const listaComentarios = document.getElementById("listaComentarios");
+            const comentarioDiv = document.createElement("div");
+            comentarioDiv.classList.add("comment");
+            comentarioDiv.innerHTML = `
+                <h4>${username || 'Usuario Anónimo'}</h4>
+                <p>${comentario}</p>
+            `;
+            listaComentarios.appendChild(comentarioDiv);
+        }
+
+        // Función para enviar un nuevo comentario
+        function enviarComentario() {
+            const comentario = document.getElementById("comentario").value;
+            const username = localStorage.getItem("username") || 'Usuario Anónimo';
+
+            if (comentario.trim() === "") {
+                alert("Por favor, escribe un comentario.");
+                return;
+            }
+
+            // Guardar comentario en el almacenamiento local
+            const comentarios = JSON.parse(localStorage.getItem("comentarios")) || [];
+            comentarios.push({ texto: comentario, username: username });
+            localStorage.setItem("comentarios", JSON.stringify(comentarios));
+
+            // Limpiar el campo de texto
+            document.getElementById("comentario").value = "";
+
+            // Recargar comentarios desde el almacenamiento local
+            cargarComentarios();
+        }
+    </script>
+</body>
+</html>
